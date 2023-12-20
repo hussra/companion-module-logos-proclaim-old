@@ -4,14 +4,14 @@ export const UpdateActions = function(self) {
 		on_air: {
 			name: 'Go On Air',
 			callback: async (event) => {
-				console.log('Go On Air');
+				self.sendAppCommand('GoOnAir');
 			}
 		},
 
 		off_air: {
 			name: 'Go Off Air',
 			callback: async (event) => {
-				console.log('Go Off Air');
+				self.sendAppCommand('GoOffAir');
 			}
 		},
 		
@@ -19,9 +19,9 @@ export const UpdateActions = function(self) {
 			name: 'Toggle On Air',
 			callback: async (event) => {
 				if (self.on_air) {
-					console.log('Go Off Air');
+					self.sendAppCommand('GoOffAir');
 				} else {
-					console.log('Go On Air');
+					self.sendAppCommand('GoOnAir');
 				}
 			}
 		},
@@ -29,14 +29,14 @@ export const UpdateActions = function(self) {
 		next_slide: {
 			name: 'Next Slide',
 			callback: async (event) => {
-				console.log('Next slide please!');
+				self.sendAppCommand('NextSlide');
 			}
 		},
 
 		previous_slide: {
 			name: 'Previous Slide',
 			callback: async (event) => {
-				console.log('Previous slide please!');
+				self.sendAppCommand('PreviousSlide');
 			}
 		},
 
