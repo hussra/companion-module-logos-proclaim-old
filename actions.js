@@ -73,12 +73,5 @@ export const UpdateActions = function(self) {
 				console.log('Go to slide ', event.options.num)
 			},
 		},
-
-		get_auth_token: {
-			name: 'Get auth token',
-			callback: async (event) => {
-				self.getAuthToken();
-			}
-		},
 	})
 }
