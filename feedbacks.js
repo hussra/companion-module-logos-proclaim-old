@@ -11,8 +11,8 @@ export const UpdateFeedbacks = async function (self) {
 				color: combineRgb(0, 0, 0),
 			},
 			callback: (feedback) => {
-				self.log('On air status: ' + self.on_air);
-				return self.on_air;
+				self.log('On air status: ' + self.on_air)
+				return self.on_air
 			},
 		},
 	})
