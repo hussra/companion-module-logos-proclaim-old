@@ -186,7 +186,10 @@ class ProclaimInstance extends InstanceBase {
 		}
 
 		try {
-			const data = await got(url, options).text()
+			const data = (await got(url, options).text()).replace(/^\uFEFF/, '')
+			if (data != 'success') {
+				self.log('debug', 'Unexpected response from Proclaim: ' + data);
+			}
 		} catch (error) {
 			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
 				self.proclaim_auth_successful = false
