@@ -32,5 +32,50 @@ export const UpdatePresets = async function (self) {
                 }
             ],
 		},
+
+        previous_slide: {
+            type: 'button',
+            category: 'Slides',
+            name: 'Previous Slide',
+            style: {
+                text: 'Prev\n\u23EE',
+                size: 'auto',
+                bgcolor: combineRgb(0, 0, 0),
+                color: combineRgb(255, 255, 255),
+            },
+            steps: [
+                {
+                    down: [
+                        {
+                            actionId: 'previous_slide'
+                        }
+                    ],
+                    up: []
+                }
+            ],
+        },
+        
+        next_slide: {
+            type: 'button',
+            category: 'Slides',
+            name: 'Next Slide',
+            style: {
+                text: 'Next\n\u23ED',
+                size: 'auto',
+                bgcolor: combineRgb(0, 0, 0),
+                color: combineRgb(255, 255, 255),
+            },
+            steps: [
+                {
+                    down: [
+                        {
+                            actionId: 'next_slide'
+                        }
+                    ],
+                    up: []
+                }
+            ],
+        },
+
 	})
 }
