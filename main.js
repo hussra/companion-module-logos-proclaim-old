@@ -7,9 +7,11 @@ import { UpdatePresets} from './presets.js'
 import got from 'got';
 
 class ProclaimInstance extends InstanceBase {
+
 	constructor(internal) {
 		super(internal)
 	}
+
 
 	// When module initialised
 	async init(config) {
@@ -22,21 +24,20 @@ class ProclaimInstance extends InstanceBase {
 		this.updateVariableDefinitions()	// Export variable definitions
 		this.updatePresets()				// Export presets
 
-		// await this.configUpdated(config)
-
 		this.setVariableValues({
 			'on_air': 0
 		});
-		this.on_air = false;							// Is Proclaim "On Air"?
-		this.on_air_session_id = '';					// Proclaim On Air Session ID
-		this.on_air_successful = false;					// Were we able to connect to check Proclaim's On Air status?
-		this.onair_poll_interval = undefined;			// The interval ID for polling On Air status
-		this.proclaim_auth_required = true; 			// Does Proclaim require authentication for App Commands?
-		this.proclaim_auth_successful = false; 			// Were we able to authenticate to Proclaim?
-		this.proclaim_auth_token = config.auth_token;	// Proclaim authentication token
+		this.on_air = false;					// Is Proclaim "On Air"?
+		this.on_air_session_id = '';			// Proclaim On Air Session ID
+		this.on_air_successful = false;			// Were we able to connect to check Proclaim's On Air status?
+		this.onair_poll_interval = undefined;	// The interval ID for polling On Air status
+		this.proclaim_auth_required = false; 	// Does Proclaim require authentication for App Commands?
+		this.proclaim_auth_successful = false; 	// Were we able to authenticate to Proclaim?
+		this.proclaim_auth_token = '';			// Proclaim authentication token
 
-		this.init_onair_poll();
+		await this.configUpdated(config)
 	}
+
 
 	// When module gets deleted
 	async destroy() {
@@ -45,69 +46,72 @@ class ProclaimInstance extends InstanceBase {
 		}
 	}
 
+
 	// When module config updated
 	async configUpdated(config) {
 
-		this.log('debug', 'Config updated');
-
-		var do_reset = false;
-
+		var resetInterval = false;
 		if (this.config.ip != config.ip) {
-			do_reset = true;
+			resetInterval = true;
 		}
 	
 		this.config = config;
-		this.proclaim_auth_token = config.auth_token;
 	
-		if (do_reset) {
+		if (resetInterval) {
 			if (this.onair_poll_interval !== undefined) {
 				clearInterval(this.onair_poll_interval);
 			}
-			this.init_onair_poll();
+		}
+		this.init_onair_poll();
+
+		this.proclaim_auth_required = (config.ip != '127.0.0.1');
+		if (this.proclaim_auth_required) {
+			this.getAuthToken();
 		}
 
-		this.updateStatus(this.getStatus());
+		this.setModuleStatus();
 	}
 
-	getStatus() {
+
+	// Look at the various status flags and determine the overall module connection status
+	setModuleStatus() {
 		var self = this;
 
 		if (!(self.config.ip)) {
-			self.updateStatus(InstanceStatus.BadConfig);
-			self.log('debug', 'Bad configuration: IP not specified');
+			self.updateStatus(InstanceStatus.BadConfig, 'IP not specified');
 			return;
 		}
 
 		if (!(self.on_air_successful)) {
-			self.updateStatus(InstanceStatus.Disconnected);
-			self.log('debug', 'Disconnected: could not get on air status');
+			self.updateStatus(InstanceStatus.Disconnected, 'Could not obtain on air status');
 			return;
 		}
 
 		if (self.proclaim_auth_required && !(self.proclaim_auth_successful)) {
-			self.updateStatus(InstanceStatus.ConnectionFailure);
-			self.log('debug', 'Connection failure: authentication required but unsuccessful');
+			self.updateStatus(InstanceStatus.ConnectionFailure, 'Authentication unsuccessful');
 			return;
 		}
 
 		self.updateStatus(InstanceStatus.Ok);
 	}
 
+
 	// Set up the regular polling of on-air status
 	init_onair_poll() {
-		// var self = this;
-		// this.onair_poll_interval = setInterval(function() {
-		// 	self.onair_poll();
-		// }, 1000);
-		// self.onair_poll();
+		var self = this;
+		this.onair_poll_interval = setInterval(function() {
+			self.onair_poll();
+		}, 1000);
+		self.onair_poll();
 	}
+
 
 	// Poll for on-air status
 	async onair_poll() {
 		var self = this;
 	
 		if (!self.config.ip) {
-			self.updateStatus(self.getStatus());
+			self.setModuleStatus();
 			return;
 		}
 
@@ -140,7 +144,7 @@ class ProclaimInstance extends InstanceBase {
 				});
 			}
 			self.checkFeedbacks('on_air');
-			self.updateStatus(self.getStatus());
+			self.setModuleStatus();
 		} catch (error) {
 			// Something went wrong obtaining on-air status - can't connect to Proclaim
 			self.on_air = false;
@@ -150,10 +154,12 @@ class ProclaimInstance extends InstanceBase {
 				'on_air': 0
 			});
 			self.checkFeedbacks('on_air');
-			self.updateStatus(self.getStatus());
+			self.setModuleStatus();
 		}
 	}
 
+
+	// Send any app command to Proclaim
 	async sendAppCommand(command) {
 		var self = this;
 
@@ -194,6 +200,8 @@ class ProclaimInstance extends InstanceBase {
 		}
 	}
 
+
+	// Get an authentication token from Proclaim
 	async getAuthToken() {
 		var self = this;
 		const url = 'http://' + self.config.ip + ':52195/appCommand/authenticate';
@@ -219,17 +227,18 @@ class ProclaimInstance extends InstanceBase {
 			self.log('debug', error);
 			// if ((error.response.statusCode == 401) && self.proclaim_auth_required ) {
 			// 	self.proclaim_auth_successful = false;
-			// 	self.updateStatus(InstanceStatus.ConnectionFailure);
+			// 	self.getStatus();
 			// }
 		}
 
-		// Because we're calling text() not json(), we need to strip the byte order marker before parsing.
-		// I don't like this.
-		var parsed = JSON.parse(data.replace(/^\uFEFF/, ""));
-		self.log('debug', 'Auth token: ' + parsed.proclaimAuthToken);
-
-		return parsed.proclaimAuthToken;
+		// Maybe because we're calling text() not json(), or maybe there's some issue in the encoding of
+		// Proclaim's response, we need to strip the byte order marker before parsing. I don't like this.
+		const parsed = JSON.parse(data.replace(/^\uFEFF/, ""));
+		self.proclaim_auth_successful = true;
+		self.proclaim_auth_token = parsed.proclaimAuthToken
+		self.setModuleStatus();
 	}
+
 
 	// Return config fields for web config
 	getConfigFields() {
@@ -251,14 +260,9 @@ class ProclaimInstance extends InstanceBase {
 				isVisible: (configValues) => configValues.host !== '127.0.0.1',
 				required: true,
 			},
-			{
-				type: 'textinput',
-				id: 'auth_token',
-				label: 'Proclaim auth token',
-				width: 6,
-			}
 		]
 	}
+
 
 	updateActions() {
 		UpdateActions(this)

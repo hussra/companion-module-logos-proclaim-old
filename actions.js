@@ -77,7 +77,6 @@ export const UpdateActions = function(self) {
 		get_auth_token: {
 			name: 'Get auth token',
 			callback: async (event) => {
-				console.log('Getting auth token');
 				self.getAuthToken();
 			}
 		},
