@@ -22,6 +22,8 @@ class ProclaimInstance extends InstanceBase {
 		this.updateVariableDefinitions()	// Export variable definitions
 		this.updatePresets()				// Export presets
 
+		// await this.configUpdated(config)
+
 		this.setVariableValues({
 			'on_air': 0
 		});
@@ -93,11 +95,11 @@ class ProclaimInstance extends InstanceBase {
 
 	// Set up the regular polling of on-air status
 	init_onair_poll() {
-		var self = this;
-		this.onair_poll_interval = setInterval(function() {
-			self.onair_poll();
-		}, 1000);
-		this.onair_poll();
+		// var self = this;
+		// this.onair_poll_interval = setInterval(function() {
+		// 	self.onair_poll();
+		// }, 1000);
+		// self.onair_poll();
 	}
 
 	// Poll for on-air status
@@ -155,7 +157,7 @@ class ProclaimInstance extends InstanceBase {
 	async sendAppCommand(command) {
 		var self = this;
 
-		const url = 'http://' + self.config.ip + ':52195' + '/appCommand/perform?appCommandName=' + command;
+		const url = 'http://' + self.config.ip + ':52195/appCommand/perform?appCommandName=' + command;
 
 		const options = {
 			timeout: {
@@ -190,6 +192,43 @@ class ProclaimInstance extends InstanceBase {
 				self.updateStatus(InstanceStatus.ConnectionFailure);
 			}
 		}
+	}
+
+	async getAuthToken() {
+		var self = this;
+		const url = 'http://' + self.config.ip + ':52195/appCommand/authenticate';
+		var data;
+		try {
+			data = await got.post(url, {
+				timeout: {
+					request: 1000
+				},
+				retry: {
+					limit: 0
+				},
+				json: {
+					Password: self.config.password
+				},
+			}).text();
+			// }).json();
+			// Calling json() returns a ERR_BODY_PARSE_FAILURE, I think because Proclaim is returning
+			// content-type: text/html rather than application/json
+
+		} catch (error) {
+			self.log('debug', 'Here is the error:\n' + JSON.stringify(error));
+			self.log('debug', error);
+			// if ((error.response.statusCode == 401) && self.proclaim_auth_required ) {
+			// 	self.proclaim_auth_successful = false;
+			// 	self.updateStatus(InstanceStatus.ConnectionFailure);
+			// }
+		}
+
+		// Because we're calling text() not json(), we need to strip the byte order marker before parsing.
+		// I don't like this.
+		var parsed = JSON.parse(data.replace(/^\uFEFF/, ""));
+		self.log('debug', 'Auth token: ' + parsed.proclaimAuthToken);
+
+		return parsed.proclaimAuthToken;
 	}
 
 	// Return config fields for web config
