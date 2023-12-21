@@ -24,6 +24,7 @@ class ProclaimInstance extends InstanceBase {
 		this.updateVariableDefinitions()	// Export variable definitions
 		this.updatePresets()				// Export presets
 
+		// Initialise state
 		this.setVariableValues({
 			'on_air': 0
 		});
@@ -35,6 +36,7 @@ class ProclaimInstance extends InstanceBase {
 		this.proclaim_auth_successful = false; 	// Were we able to authenticate to Proclaim?
 		this.proclaim_auth_token = '';			// Proclaim authentication token
 
+		// Process module config
 		await this.configUpdated(config)
 	}
 
@@ -50,6 +52,7 @@ class ProclaimInstance extends InstanceBase {
 	// When module config updated
 	async configUpdated(config) {
 
+		// If IP changes, need to cancel and restart the on-air polling
 		var resetInterval = false;
 		if (this.config.ip != config.ip) {
 			resetInterval = true;
@@ -64,6 +67,7 @@ class ProclaimInstance extends InstanceBase {
 		}
 		this.init_onair_poll();
 
+		// Ask for an auth token
 		this.proclaim_auth_required = (config.ip != '127.0.0.1');
 		if (this.proclaim_auth_required) {
 			this.getAuthToken();
