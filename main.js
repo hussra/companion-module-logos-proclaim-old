@@ -49,16 +49,11 @@ class ProclaimInstance extends InstanceBase {
 	async configUpdated(config) {
 		// If IP changes, need to cancel and restart the on-air polling
 		var resetInterval = false
-		if (this.config.ip != config.ip) {
-			resetInterval = true
-		}
 
 		this.config = config
 
-		if (resetInterval) {
-			if (this.onair_poll_interval !== undefined) {
-				clearInterval(this.onair_poll_interval)
-			}
+		if (this.onair_poll_interval !== undefined) {
+			clearInterval(this.onair_poll_interval)
 		}
 		this.init_onair_poll()
 
@@ -170,6 +165,10 @@ class ProclaimInstance extends InstanceBase {
 		}
 
 		if (self.proclaim_auth_required) {
+			if (!self.proclaim_auth_successful) {
+				return
+			}
+
 			options.headers = {
 				ProclaimAuthToken: self.proclaim_auth_token,
 			}
@@ -188,12 +187,13 @@ class ProclaimInstance extends InstanceBase {
 		try {
 			const data = (await got(url, options).text()).replace(/^\uFEFF/, '')
 			if (data != 'success') {
-				self.log('debug', 'Unexpected response from Proclaim: ' + data);
+				self.log('debug', 'Unexpected response from Proclaim: ' + data)
 			}
 		} catch (error) {
 			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
 				self.proclaim_auth_successful = false
-				self.updateStatus(InstanceStatus.ConnectionFailure)
+				self.proclaim_auth_token = ''
+				self.setModuleStatus()
 			}
 		}
 	}
@@ -220,21 +220,21 @@ class ProclaimInstance extends InstanceBase {
 			// }).json();
 			// Calling json() returns a ERR_BODY_PARSE_FAILURE, I think because Proclaim is returning
 			// content-type: text/html rather than application/json
+
+			// Maybe because we're calling text() not json(), or maybe there's some issue in the encoding of
+			// Proclaim's response, we need to strip the byte order marker before parsing. I don't like this.
+			const parsed = JSON.parse(data.replace(/^\uFEFF/, ''))
+			self.proclaim_auth_successful = true
+			self.proclaim_auth_token = parsed.proclaimAuthToken
+			self.setModuleStatus()
 		} catch (error) {
 			self.log('debug', 'Here is the error:\n' + JSON.stringify(error))
 			self.log('debug', error)
-			// if ((error.response.statusCode == 401) && self.proclaim_auth_required ) {
-			// 	self.proclaim_auth_successful = false;
-			// 	self.getStatus();
-			// }
+			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
+				self.proclaim_auth_successful = false
+				self.setModuleStatus()
+			}
 		}
-
-		// Maybe because we're calling text() not json(), or maybe there's some issue in the encoding of
-		// Proclaim's response, we need to strip the byte order marker before parsing. I don't like this.
-		const parsed = JSON.parse(data.replace(/^\uFEFF/, ''))
-		self.proclaim_auth_successful = true
-		self.proclaim_auth_token = parsed.proclaimAuthToken
-		self.setModuleStatus()
 	}
 
 	// Return config fields for web config
