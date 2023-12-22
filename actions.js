@@ -66,7 +66,7 @@ export const UpdateActions = function (self) {
 			],
 			callback: async (event) => {
 				const part = self.song_parts[event.options.song_part].label
-				self.sendAppCommand('ShowSongLyrics' + part + 'ByIndex', event.options.item_index)
+				self.sendAppCommand(`ShowSongLyrics${part}ByIndex`, event.options.item_index)
 			},
 		},
 	}

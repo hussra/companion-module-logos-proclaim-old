@@ -81,16 +81,16 @@ export const UpdatePresets = async function (self) {
 	for (var part in self.song_parts) {
 		if (self.song_parts[part].label == 'Verse') {
 			for (var v = 1; v < 10; v++) {
-				const id = 'song_part_' + self.song_parts[part].path + '_' + v
+				const id = `song_part_${self.song_parts[part].path}_${v}`
 				presets[id] = {
 					type: 'button',
 					category: 'Song Parts',
-					name: self.song_parts[part].label + ' ' + v,
+					name: `${self.song_parts[part].label} ${v}`,
 					style: {
 						...style,
 						text: self.song_parts[part].displayLabel
-							? self.song_parts[part].displayLabel + '\\n' + v
-							: self.song_parts[part].label + '\\n' + v,
+							? `${self.song_parts[part].displayLabel}\\n${v}`
+							: `${self.song_parts[part].label}\\n${v}`,
 					},
 					steps: [
 						{
@@ -109,7 +109,7 @@ export const UpdatePresets = async function (self) {
 				}
 			}
 		} else {
-			const id = 'song_part_' + self.song_parts[part].path
+			const id = `song_part_${self.song_parts[part].path}`
 			presets[id] = {
 				type: 'button',
 				category: 'Song Parts',

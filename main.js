@@ -117,7 +117,7 @@ class ProclaimInstance extends InstanceBase {
 			return
 		}
 
-		const url = 'http://' + self.config.ip + ':52195' + '/onair/session'
+		const url = `http://${self.config.ip}:52195/onair/session`
 		const on_air_previously_successful = self.on_air_successful
 
 		try {
@@ -136,14 +136,14 @@ class ProclaimInstance extends InstanceBase {
 				self.on_air_session_id = data
 				self.on_air_successful = true
 				this.setVariableValues({
-					on_air: 1,
+					on_air: true,
 				})
 			} else {
 				self.on_air = false
 				self.on_air_session_id = ''
 				self.on_air_successful = true
 				this.setVariableValues({
-					on_air: 0,
+					on_air: false,
 				})
 			}
 			self.checkFeedbacks('on_air')
@@ -170,9 +170,9 @@ class ProclaimInstance extends InstanceBase {
 	async sendAppCommand(command, index) {
 		var self = this
 
-		let url = 'http://' + self.config.ip + ':52195/appCommand/perform?appCommandName=' + command
+		let url = `http://${self.config.ip}:52195/appCommand/perform?appCommandName=${command}`
 		if (index !== undefined) {
-			url = url + '&index=' + index
+			url = `${url}&index=${index}`
 		}
 
 		const options = {
@@ -208,7 +208,7 @@ class ProclaimInstance extends InstanceBase {
 		try {
 			const data = (await got(url, options).text()).replace(/^\uFEFF/, '')
 			if (data != 'success') {
-				self.log('debug', 'Unexpected response from Proclaim: ' + data)
+				self.log('debug', `Unexpected response from Proclaim: ${data}`)
 			}
 		} catch (error) {
 			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
@@ -222,7 +222,7 @@ class ProclaimInstance extends InstanceBase {
 	// Get an authentication token from Proclaim
 	async getAuthToken() {
 		var self = this
-		const url = 'http://' + self.config.ip + ':52195/appCommand/authenticate'
+		const url = `http://${self.config.ip}:52195/appCommand/authenticate`
 		var data
 		try {
 			data = await got
@@ -249,8 +249,6 @@ class ProclaimInstance extends InstanceBase {
 			self.proclaim_auth_token = parsed.proclaimAuthToken
 			self.setModuleStatus()
 		} catch (error) {
-			self.log('debug', 'Here is the error:\n' + JSON.stringify(error))
-			self.log('debug', error)
 			if (error.response && error.response.statusCode == 401 && self.proclaim_auth_required) {
 				self.proclaim_auth_successful = false
 				self.setModuleStatus()
