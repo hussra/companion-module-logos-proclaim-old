@@ -100,38 +100,4 @@ export const UpdateActions = function (self) {
 	}
 
 	self.setActionDefinitions(actions)
-
-	/*
-	self.setActionDefinitions({
-		on_air: {
-			name: 'Go On Air',
-			callback: async (event) => {
-				self.sendAppCommand('GoOnAir')
-			},
-		},
-
-		off_air: {
-			name: 'Go Off Air',
-			callback: async (event) => {
-				self.sendAppCommand('GoOffAir')
-			},
-		},
-
-
-
-		next_slide: {
-			name: 'Next Slide',
-			callback: async (event) => {
-				self.sendAppCommand('NextSlide')
-			},
-		},
-
-		previous_slide: {
-			name: 'Previous Slide',
-			callback: async (event) => {
-				self.sendAppCommand('PreviousSlide')
-			},
-		},
-	})
-*/
 }
