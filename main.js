@@ -118,6 +118,7 @@ class ProclaimInstance extends InstanceBase {
 		}
 
 		const url = 'http://' + self.config.ip + ':52195' + '/onair/session'
+		const on_air_previously_successful = self.on_air_successful
 
 		try {
 			const data = await got(url, {
@@ -147,6 +148,11 @@ class ProclaimInstance extends InstanceBase {
 			}
 			self.checkFeedbacks('on_air')
 			self.setModuleStatus()
+
+			// If Proclaim is now responding and wasn't previously, try to authenticate
+			if (self.on_air_successful && !on_air_previously_successful && self.proclaim_auth_required) {
+				self.getAuthToken()
+			}
 		} catch (error) {
 			// Something went wrong obtaining on-air status - can't connect to Proclaim
 			self.on_air = false
@@ -187,8 +193,9 @@ class ProclaimInstance extends InstanceBase {
 				ProclaimAuthToken: self.proclaim_auth_token,
 			}
 
-			// This shouldn't be necessary... but it is. Proclaim requires the ProclaimAuthToken header
-			// name to be CamelCase, though the HTTP spec says header names are case-insensitive.
+			// This shouldn't be necessary... but it is, for now.
+			// Proclaim requires the ProclaimAuthToken header name to be CamelCase, though
+			// the HTTP spec says header names are case-insensitive.
 			options.hooks = {
 				beforeRequest: [
 					(options) => {
