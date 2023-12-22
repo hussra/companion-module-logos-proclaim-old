@@ -2,7 +2,7 @@ import { combineRgb } from '@companion-module/base'
 
 export const UpdatePresets = async function (self) {
 	const style = {
-		size: 'auto',
+		size: '18',
 		bgcolor: combineRgb(0, 0, 0),
 		color: combineRgb(255, 255, 255),
 	}
@@ -86,7 +86,12 @@ export const UpdatePresets = async function (self) {
 					type: 'button',
 					category: 'Song Parts',
 					name: self.song_parts[part].label + ' ' + v,
-					style: { ...style, text: self.song_parts[part].label + '\\n' + v },
+					style: {
+						...style,
+						text: self.song_parts[part].displayLabel
+							? self.song_parts[part].displayLabel + '\\n' + v
+							: self.song_parts[part].label + '\\n' + v,
+					},
 					steps: [
 						{
 							down: [
@@ -109,7 +114,10 @@ export const UpdatePresets = async function (self) {
 				type: 'button',
 				category: 'Song Parts',
 				name: self.song_parts[part].label,
-				style: { ...style, text: self.song_parts[part].label },
+				style: {
+					...style,
+					text: self.song_parts[part].displayLabel ? self.song_parts[part].displayLabel : self.song_parts[part].label,
+				},
 				steps: [
 					{
 						down: [
