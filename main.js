@@ -17,6 +17,17 @@ class ProclaimInstance extends InstanceBase {
 
 		this.updateStatus(InstanceStatus.Connecting)
 
+		// Reference data
+		this.song_parts = [
+			{ id: 0, label: 'Verse', path: 'verse' },
+			{ id: 1, label: 'Chorus', path: 'chorus' },
+			{ id: 2, label: 'Bridge', path: 'bridge' },
+			{ id: 3, label: 'Prechorus', path: 'prechorus' },
+			{ id: 4, label: 'Interlude', path: 'interlude' },
+			{ id: 5, label: 'Tag', path: 'tag' },
+			{ id: 6, label: 'Ending', path: 'ending' },
+		]
+
 		this.updateActions() // Export actions
 		this.updateFeedbacks() // Export feedbacks
 		this.updateVariableDefinitions() // Export variable definitions
@@ -150,10 +161,13 @@ class ProclaimInstance extends InstanceBase {
 	}
 
 	// Send any app command to Proclaim
-	async sendAppCommand(command) {
+	async sendAppCommand(command, index) {
 		var self = this
 
-		const url = 'http://' + self.config.ip + ':52195/appCommand/perform?appCommandName=' + command
+		let url = 'http://' + self.config.ip + ':52195/appCommand/perform?appCommandName=' + command
+		if (index !== undefined) {
+			url = url + '&index=' + index
+		}
 
 		const options = {
 			timeout: {
@@ -230,7 +244,7 @@ class ProclaimInstance extends InstanceBase {
 		} catch (error) {
 			self.log('debug', 'Here is the error:\n' + JSON.stringify(error))
 			self.log('debug', error)
-			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
+			if (error.response && error.response.statusCode == 401 && self.proclaim_auth_required) {
 				self.proclaim_auth_successful = false
 				self.setModuleStatus()
 			}
