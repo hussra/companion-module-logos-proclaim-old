@@ -87,12 +87,12 @@ class ProclaimInstance extends InstanceBase {
 		}
 
 		if (!self.on_air_successful) {
-			self.updateStatus(InstanceStatus.Disconnected, 'Could not obtain on air status')
+			self.updateStatus(InstanceStatus.Disconnected, 'Could not connect to Proclaim')
 			return
 		}
 
 		if (self.proclaim_auth_required && !self.proclaim_auth_successful) {
-			self.updateStatus(InstanceStatus.ConnectionFailure, 'Authentication unsuccessful')
+			self.updateStatus(InstanceStatus.ConnectionFailure, 'proclaim authentication unsuccessful')
 			return
 		}
 
@@ -259,6 +259,21 @@ class ProclaimInstance extends InstanceBase {
 	// Return config fields for web config
 	getConfigFields() {
 		return [
+			{
+				type: 'static-text',
+				id: 'intro',
+				label: 'Configuring Proclaim',
+				value: `<p>To use this module, first ensure Proclaim's local server is enabled. To do so, open Proclaim and go to
+					<b>Settings &gt; Remote</b> and click <b>Enable</b>.</p>
+					<p>If you are running Proclaim on Windows, you may be prompted to allow Proclaim to make a firewall exception
+					for the port it needs to expose to allow remote control.</p>
+					<p>If Companion and Proclaim are running on <b>the same computer</b>, module configuration is complete.
+					<p>If you are running Companion and Proclaim on <b>different computers</b>, make a note of the IP address shown in the
+					Proclaim settings dialog, entering it in Companion below.</p>
+					<p>Then scroll down to <b>Network Control Password</b> in the Proclaim settings dialog and choose a password,
+					entering the same password in Companion below.</p>`,
+				width: 12,
+			},
 			{
 				type: 'textinput',
 				id: 'ip',
