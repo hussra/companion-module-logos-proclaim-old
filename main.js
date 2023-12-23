@@ -58,9 +58,6 @@ class ProclaimInstance extends InstanceBase {
 
 	// When module config updated
 	async configUpdated(config) {
-		// If IP changes, need to cancel and restart the on-air polling
-		var resetInterval = false
-
 		this.config = config
 
 		if (this.onair_poll_interval !== undefined) {

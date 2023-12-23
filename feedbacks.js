@@ -10,7 +10,7 @@ export const UpdateFeedbacks = async function (self) {
 				bgcolor: combineRgb(255, 0, 0),
 				color: combineRgb(0, 0, 0),
 			},
-			callback: (feedback) => {
+			callback: () => {
 				return self.on_air
 			},
 		},

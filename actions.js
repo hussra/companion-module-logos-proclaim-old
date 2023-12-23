@@ -2,7 +2,7 @@ export const UpdateActions = function (self) {
 	let actions = {
 		on_air_toggle: {
 			name: 'Toggle On Air',
-			callback: async (event) => {
+			callback: async () => {
 				if (self.on_air) {
 					self.sendAppCommand('GoOffAir')
 				} else {
@@ -93,7 +93,7 @@ export const UpdateActions = function (self) {
 		let appCommand = simpleActions[action].appCommand
 		actions[id] = {
 			name: name,
-			callback: async (event) => {
+			callback: async () => {
 				self.sendAppCommand(appCommand)
 			},
 		}
