@@ -288,7 +288,7 @@ class ProclaimInstance extends InstanceBase {
 				id: 'password',
 				label: 'Password',
 				width: 6,
-				isVisible: (configValues) => configValues.host !== '127.0.0.1',
+				isVisible: (configValues) => configValues.ip !== '127.0.0.1',
 				required: true,
 			},
 		]
