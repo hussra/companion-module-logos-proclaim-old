@@ -76,46 +76,41 @@ class ProclaimInstance extends InstanceBase {
 
 	// Look at the various status flags and determine the overall module connection status
 	setModuleStatus() {
-		var self = this
-
-		if (!self.config.ip) {
-			self.updateStatus(InstanceStatus.BadConfig, 'IP not specified')
+		if (!this.config.ip) {
+			this.updateStatus(InstanceStatus.BadConfig, 'IP not specified')
 			return
 		}
 
-		if (!self.on_air_successful) {
-			self.updateStatus(InstanceStatus.Disconnected, 'Could not connect to Proclaim')
+		if (!this.on_air_successful) {
+			this.updateStatus(InstanceStatus.Disconnected, 'Could not connect to Proclaim')
 			return
 		}
 
-		if (self.proclaim_auth_required && !self.proclaim_auth_successful) {
-			self.updateStatus(InstanceStatus.ConnectionFailure, 'proclaim authentication unsuccessful')
+		if (this.proclaim_auth_required && !this.proclaim_auth_successful) {
+			this.updateStatus(InstanceStatus.ConnectionFailure, 'proclaim authentication unsuccessful')
 			return
 		}
 
-		self.updateStatus(InstanceStatus.Ok)
+		this.updateStatus(InstanceStatus.Ok)
 	}
 
 	// Set up the regular polling of on-air status
 	init_onair_poll() {
-		var self = this
-		this.onair_poll_interval = setInterval(function () {
-			self.onair_poll()
+		this.onair_poll_interval = setInterval(() => {
+			this.onair_poll()
 		}, 1000)
-		self.onair_poll()
+		this.onair_poll()
 	}
 
 	// Poll for on-air status
 	async onair_poll() {
-		var self = this
-
-		if (!self.config.ip) {
-			self.setModuleStatus()
+		if (!this.config.ip) {
+			this.setModuleStatus()
 			return
 		}
 
-		const url = `http://${self.config.ip}:52195/onair/session`
-		const on_air_previously_successful = self.on_air_successful
+		const url = `http://${this.config.ip}:52195/onair/session`
+		const on_air_previously_successful = this.on_air_successful
 
 		try {
 			const data = await got(url, {
@@ -127,47 +122,45 @@ class ProclaimInstance extends InstanceBase {
 				},
 			}).text()
 
+			this.on_air_successful = true
+
 			// If we got a session ID back, we're on air! If we got blank, we're off air
 			if (data.length > 30) {
-				self.on_air = true
-				self.on_air_session_id = data
-				self.on_air_successful = true
+				this.on_air = true
+				this.on_air_session_id = data
 				this.setVariableValues({
 					on_air: true,
 				})
 			} else {
-				self.on_air = false
-				self.on_air_session_id = ''
-				self.on_air_successful = true
+				this.on_air = false
+				this.on_air_session_id = ''
 				this.setVariableValues({
 					on_air: false,
 				})
 			}
-			self.checkFeedbacks('on_air')
-			self.setModuleStatus()
+			this.checkFeedbacks('on_air')
+			this.setModuleStatus()
 
 			// If Proclaim is now responding and wasn't previously, try to authenticate
-			if (self.on_air_successful && !on_air_previously_successful && self.proclaim_auth_required) {
-				self.getAuthToken()
+			if (this.on_air_successful && !on_air_previously_successful && this.proclaim_auth_required) {
+				this.getAuthToken()
 			}
 		} catch (error) {
 			// Something went wrong obtaining on-air status - can't connect to Proclaim
-			self.on_air = false
-			self.on_air_successful = false
-			self.on_air_session_id = ''
+			this.on_air_successful = false
+			this.on_air = false
+			this.on_air_session_id = ''
 			this.setVariableValues({
 				on_air: 0,
 			})
-			self.checkFeedbacks('on_air')
-			self.setModuleStatus()
+			this.checkFeedbacks('on_air')
+			this.setModuleStatus()
 		}
 	}
 
 	// Send any app command to Proclaim
 	async sendAppCommand(command, index) {
-		var self = this
-
-		let url = `http://${self.config.ip}:52195/appCommand/perform?appCommandName=${command}`
+		let url = `http://${this.config.ip}:52195/appCommand/perform?appCommandName=${command}`
 		if (index !== undefined) {
 			url = `${url}&index=${index}`
 		}
@@ -181,13 +174,13 @@ class ProclaimInstance extends InstanceBase {
 			},
 		}
 
-		if (self.proclaim_auth_required) {
-			if (!self.proclaim_auth_successful) {
+		if (this.proclaim_auth_required) {
+			if (!this.proclaim_auth_successful) {
 				return
 			}
 
 			options.headers = {
-				ProclaimAuthToken: self.proclaim_auth_token,
+				ProclaimAuthToken: this.proclaim_auth_token,
 			}
 
 			// This shouldn't be necessary... but it is, for now.
@@ -205,21 +198,20 @@ class ProclaimInstance extends InstanceBase {
 		try {
 			const data = (await got(url, options).text()).replace(/^\uFEFF/, '')
 			if (data != 'success') {
-				self.log('debug', `Unexpected response from Proclaim: ${data}`)
+				this.log('debug', `Unexpected response from Proclaim: ${data}`)
 			}
 		} catch (error) {
-			if (error.response.statusCode == 401 && self.proclaim_auth_required) {
-				self.proclaim_auth_successful = false
-				self.proclaim_auth_token = ''
-				self.setModuleStatus()
+			if (error.response.statusCode == 401 && this.proclaim_auth_required) {
+				this.proclaim_auth_successful = false
+				this.proclaim_auth_token = ''
+				this.setModuleStatus()
 			}
 		}
 	}
 
 	// Get an authentication token from Proclaim
 	async getAuthToken() {
-		var self = this
-		const url = `http://${self.config.ip}:52195/appCommand/authenticate`
+		const url = `http://${this.config.ip}:52195/appCommand/authenticate`
 		var data
 		try {
 			data = await got
@@ -231,7 +223,7 @@ class ProclaimInstance extends InstanceBase {
 						limit: 0,
 					},
 					json: {
-						Password: self.config.password,
+						Password: this.config.password,
 					},
 				})
 				.text()
@@ -242,13 +234,13 @@ class ProclaimInstance extends InstanceBase {
 			// Maybe because we're calling text() not json(), or maybe there's some issue in the encoding of
 			// Proclaim's response, we need to strip the byte order marker before parsing. I don't like this.
 			const parsed = JSON.parse(data.replace(/^\uFEFF/, ''))
-			self.proclaim_auth_successful = true
-			self.proclaim_auth_token = parsed.proclaimAuthToken
-			self.setModuleStatus()
+			this.proclaim_auth_successful = true
+			this.proclaim_auth_token = parsed.proclaimAuthToken
+			this.setModuleStatus()
 		} catch (error) {
-			if (error.response && error.response.statusCode == 401 && self.proclaim_auth_required) {
-				self.proclaim_auth_successful = false
-				self.setModuleStatus()
+			if (error.response && error.response.statusCode == 401 && this.proclaim_auth_required) {
+				this.proclaim_auth_successful = false
+				this.setModuleStatus()
 			}
 		}
 	}
