@@ -35,7 +35,7 @@ class ProclaimInstance extends InstanceBase {
 
 		// Initialise state
 		this.setVariableValues({
-			on_air: 0,
+			on_air: false,
 		})
 		this.on_air = false // Is Proclaim "On Air"?
 		this.on_air_session_id = '' // Proclaim On Air Session ID
