@@ -64,10 +64,25 @@ The commands available are:
 
 - Go To Song Part - by part (Verse, Chorus, etc.) and index
 
+### Media
+
+- Previous Audio Item
+- Next Audio Item
+- Video Play
+- Video Pause
+- Video Restart
+
 ### Quick Screens
 
 - Blank
 - Logo
 - No Text
+- Floating Hearts
+- Floating Amens
+- Amen
+- Hallelujah
+- Praise the Lord!
+- He is Risen
+- He is Risen Indeed!
 
 There are presets for all of these commands, including a useful "On Air" toggle button providing feedback.
