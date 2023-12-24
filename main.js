@@ -251,22 +251,18 @@ class ProclaimInstance extends InstanceBase {
 			{
 				type: 'static-text',
 				id: 'intro',
-				label: 'Configuring Proclaim',
-				value: `<p>To use this module, first ensure Proclaim's local server is enabled. To do so, open Proclaim and go to
-					<b>Settings &gt; Remote</b> and click <b>Enable</b>.</p>
-					<p>If you are running Proclaim on Windows, you may be prompted to allow Proclaim to make a firewall exception
-					for the port it needs to expose to allow remote control.</p>
-					<p>If Companion and Proclaim are running on <b>the same computer</b>, module configuration is complete.
-					<p>If you are running Companion and Proclaim on <b>different computers</b>, make a note of the IP address shown in the
-					Proclaim settings dialog, entering it in Companion below.</p>
-					<p>Then scroll down to <b>Network Control Password</b> in the Proclaim settings dialog and choose a password,
-					entering the same password in Companion below.</p>`,
+				label: 'Configuration Help',
+				value: `<p>First ensure that Proclaim's "Local Server" is enabled (see <b>Settings > Remote</b>).</p>
+				<p>If you are running Proclaim and Companion on different computers, you must also note the Proclaim
+				computer's IP address, and set a Network Control Password in <b>Settings > Remote</b>.</p>
+				<p>Then enter the IP address and password below.</p>
+				<p>See the Help for this module for further details.</p>`,
 				width: 12,
 			},
 			{
 				type: 'textinput',
 				id: 'ip',
-				label: 'Proclaim IP',
+				label: 'Proclaim computer IP address',
 				width: 6,
 				regex: Regex.IP,
 				default: '127.0.0.1',
