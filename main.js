@@ -60,18 +60,18 @@ class ProclaimInstance extends InstanceBase {
 	async configUpdated(config) {
 		this.config = config
 
+		// Initialise on-air polling
 		if (this.onair_poll_interval !== undefined) {
 			clearInterval(this.onair_poll_interval)
 		}
 		this.init_onair_poll()
 
-		// Ask for an auth token
+		// Does Proclaim require authentication?
 		this.proclaim_auth_required = config.ip != '127.0.0.1'
 		if (this.proclaim_auth_required) {
+			// Ask for an auth token
 			this.getAuthToken()
 		}
-
-		this.setModuleStatus()
 	}
 
 	// Look at the various status flags and determine the overall module connection status
@@ -87,7 +87,7 @@ class ProclaimInstance extends InstanceBase {
 		}
 
 		if (this.proclaim_auth_required && !this.proclaim_auth_successful) {
-			this.updateStatus(InstanceStatus.ConnectionFailure, 'proclaim authentication unsuccessful')
+			this.updateStatus(InstanceStatus.ConnectionFailure, 'Proclaim authentication unsuccessful')
 			return
 		}
 
