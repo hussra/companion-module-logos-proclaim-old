@@ -45,10 +45,10 @@ export const UpdatePresets = async function (self) {
 		{ id: 'go_off_air', name: 'Go Off Air', category: 'On Air', text: 'Go Off Air' },
 
 		// Slides
-		{ id: 'previous_slide', name: 'Previous Slide', category: 'Slides', text: 'Slide\n\u2B05' },
-		{ id: 'next_slide', name: 'Next Slide', category: 'Slides', text: 'Slide\n\u27A1' },
-		{ id: 'previous_service_item', name: 'Previous Service Item', category: 'Slides', text: 'Item\n\u23EA' },
-		{ id: 'next_service_item', name: 'Next Service Item', category: 'Slides', text: 'Item\n\u23E9' },
+		{ id: 'previous_slide', name: 'Previous Slide', category: 'Slides', text: 'Prev\nSlide' },
+		{ id: 'next_slide', name: 'Next Slide', category: 'Slides', text: 'Next\nSlide' },
+		{ id: 'previous_service_item', name: 'Previous Service Item', category: 'Slides', text: 'Prev\nItem' },
+		{ id: 'next_service_item', name: 'Next Service Item', category: 'Slides', text: 'Next\nItem' },
 
 		// Service Parts
 		{ id: 'start_pre_service', name: 'Start Pre Service', category: 'Service Parts', text: 'Pre Service' },
@@ -57,11 +57,11 @@ export const UpdatePresets = async function (self) {
 		{ id: 'start_post_service', name: 'Start Post Service', category: 'Service Parts', text: 'Post Service' },
 
 		// Media
-		{ id: 'previous_audio_item', name: 'Previous Audio Item', category: 'Media', text: 'Audio\n\u23EE' },
-		{ id: 'next_audio_item', name: 'Next Audio Item', category: 'Media', text: 'Audio\n\u23ED' },
-		{ id: 'video_play', name: 'Video Play', category: 'Media', text: 'Video\n\u23F5' },
-		{ id: 'video_pause', name: 'Video Pause', category: 'Media', text: 'Video\n\u23F8' },
-		{ id: 'video_restart', name: 'Video Restart', category: 'Media', text: 'Video\n\u23EA' },
+		{ id: 'previous_audio_item', name: 'Previous Audio Item', category: 'Media', text: 'Prev\nAudio' },
+		{ id: 'next_audio_item', name: 'Next Audio Item', category: 'Media', text: 'Next\nAudio' },
+		{ id: 'video_play', name: 'Video Play', category: 'Media', text: 'Video\nPlay' },
+		{ id: 'video_pause', name: 'Video Pause', category: 'Media', text: 'Video\nPause' },
+		{ id: 'video_restart', name: 'Video Restart', category: 'Media', text: 'Video\nRestart' },
 
 		// Quick Screens
 		{ id: 'show_blank_quick_screen', name: 'Show Blank Quick Screen', category: 'Quick Screens', text: 'Blank' },
