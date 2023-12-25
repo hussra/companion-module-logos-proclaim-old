@@ -3,7 +3,8 @@
 This module provides the ability for Companion to control [Logos Proclaim](https://proclaim.logos.com/),
 a cloud-based presentation software built specifically for churches.
 
-This module has been developed and tested with Proclaim version 4.0.0.0072 and Companion 3.1.2.
+This module has been developed and tested with Proclaim version 4.0.0.0072, and with Companion 3.1.2 and
+the 3.2 betas.
 
 ### Configuring Proclaim
 
