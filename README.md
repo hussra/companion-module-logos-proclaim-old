@@ -12,5 +12,5 @@ Known issues:
 - Proclaim currently requires the authentication header name to be capitalized as ProclaimAuthToken - there is
   code in sendAppCommand() which can be removed once Proclaim updates this.
 - Proclaim currently returns API responses with the text/html content-type rather than text/plain and text/json
-  as appropriate. I think this may be why I had to use Got's .text() method rather than .json(), and manually
-  strip the byte order marker, to be able to parse the response containing the authentication token.
+  as appropriate. I think this may be why in getAuthToken() I had to use Got's .text() method rather than .json(),
+  and manually strip the byte order marker, to be able to parse the response containing the authentication token.
